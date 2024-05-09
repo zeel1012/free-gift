@@ -16,11 +16,13 @@ class GiftSku
 
     public function isValid(\Magento\Framework\DataObject $rule): bool
     {
-        $skus = array_unique(explode(',', $rule->getGiftSkus()));
+        $skus = $rule->getGiftSkus();
 
         if (empty($skus)) {
             return true;
         }
+
+        $skus = array_unique(explode(',', $skus));
 
         $connection = $this->resourceConnection->getConnection();
         $select = $connection->select()

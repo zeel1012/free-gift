@@ -30,6 +30,7 @@ class ValidateGiftSkus
             $result = [];
         }
 
-        return $result[] = __('Provided gift SKU does not exist in the catalog.');
+        $result[] = __('Provided gift SKU does not exist in the catalog.');
+        return $result;
     }
 }
