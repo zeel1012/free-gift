@@ -8,70 +8,87 @@ class Cart
      * @var \Magento\Framework\Data\Form\FormKey
      */
     protected $formKey;
+
     /**
      * @var \Magento\Checkout\Model\Cart
      */
     protected $cart;
+
     /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
     protected $productRepository;
+
     /**
      * @var \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable
      */
     protected $configurableProduct;
+
     /**
      * @var \Magento\Framework\Serialize\Serializer\Json
      */
     protected $serializer;
+
     /**
      * @var \Magento\Framework\EntityManager\EventManager
      */
     protected $eventManager;
+
     /**
      * @var \Magento\CatalogInventory\Model\Quote\Item\QuantityValidator\QuoteItemQtyList
      */
     protected $quoteItemQtyList;
+
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
     protected $request;
+
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
     protected $response;
+
     /**
      * @var \Magento\Framework\DataObject\Factory
      */
     protected $dataObjectFactory;
+
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
+
     /**
      * @var \Magento\CatalogInventory\Api\StockStateInterface
      */
     protected $stockState;
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $scopeConfig;
+
     /**
      * @var \MageSuite\FreeGift\Model\Factory\GetStockItemDataFactory
      */
     protected $getStockItemDataFactory;
+
     /**
      * @var \MageSuite\FreeGift\Model\Factory\StockResolverFactory
      */
     protected $stockResolverFactory;
+
     /**
      * @var \MageSuite\FreeGift\Model\Factory\SalesChannelFactory
      */
     protected $salesChannelFactory;
+
     /**
      * @var \Magento\CatalogInventory\Api\StockRegistryInterface
      */
     protected $stockRegistry;
+
     /**
      * @var \MageSuite\FreeGift\Model\ConfigProvider
      */
@@ -116,7 +133,6 @@ class Cart
         \MageSuite\FreeGift\Model\Factory\SalesChannelFactory $salesChannelFactory,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         \MageSuite\FreeGift\Model\ConfigProvider $configProvider
-
     )
     {
         $this->formKey = $formKey;
@@ -318,27 +334,30 @@ class Cart
     protected function determineQtyWithoutMsi($requestedQty, $product)
     {
         $availableQuantity = 0.0;
+
         // Get stock item data
         $stockItem = $this->stockRegistry->getStockItemBySku($product->getSku());
-            if ($stockItem && $stockItem->getIsInStock()) {
-                $availableQuantity = $stockItem->getQty();
-            }
-        $qtyAlreadyAddedToCart = 0;
-            // Calculate quantity already added to cart
-            foreach ($this->cart->getQuote()->getAllItems() as $quoteItem) {
-                if ($quoteItem->isDeleted()) {
-                    continue;
-                }
-                if ($quoteItem->getProduct()->getId() != $product->getId()) {
-                    continue;
-                }
-                $qtyAlreadyAddedToCart += $quoteItem->getQty();
-                }
+        if ($stockItem && $stockItem->getIsInStock()) {
+            $availableQuantity = $stockItem->getQty();
+        }
 
-                $availableQuantity -= $qtyAlreadyAddedToCart;
-                if ($availableQuantity < 0) {
-                    return 0;
-                }
+        $qtyAlreadyAddedToCart = 0;
+
+        // Calculate quantity already added to cart
+        foreach ($this->cart->getQuote()->getAllItems() as $quoteItem) {
+            if ($quoteItem->isDeleted()) {
+                continue;
+            }
+            if ($quoteItem->getProduct()->getId() != $product->getId()) {
+                continue;
+            }
+            $qtyAlreadyAddedToCart += $quoteItem->getQty();
+        }
+
+        $availableQuantity -= $qtyAlreadyAddedToCart;
+        if ($availableQuantity < 0) {
+            return 0;
+        }
         return min($requestedQty, $availableQuantity);
     }
 
